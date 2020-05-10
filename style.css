@@ -1,0 +1,41 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin: 0 auto;
+    width: 1200px;
+}
+
+body {
+    font-family: "Montserrat", sans-serif;
+}
+
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+#interface-panel{
+    background-color: gray;
+    width: 30%;
+    min-height: 100vh;
+    float: left;
+}
+
+#map-panel{
+    background-color: green;
+    height: 100vh;
+    width: 70%;
+    float: right;
+}
+#map-text{
+    height: 20%;
+    background-color: blue;
+}
+#map{
+    height: 80%;
+    background-color: red;
+}
