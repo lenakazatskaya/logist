@@ -17,7 +17,14 @@
 <body>
     <div class="container">
 
-        <div id="interface-panel"></div>
+        <div id="interface-panel">
+            <div class="standart-padding">
+                <div id="address-list-block">
+                    <div class="add" onclick="addInput()">+</div>
+                </div>
+            </div>
+
+        </div>
         <div id="map-panel">
             <div id="map-text"></div>
             <div id="map"></div>
@@ -25,23 +32,53 @@
 
     </div>
     <script>
-        function initMap() {
-            var directionsService = new google.maps.DirectionsService;
-            var directionsRenderer = new google.maps.DirectionsRenderer;
 
-            //? Указывать начальную как?
-            var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 6,
-                center: { lat: 41.85, lng: -87.65 }
-            });
-            directionsRenderer.setMap(map);
+        var amount_address = 3;
+
+        function addInput() {
+
+            if (amount_address < 16) {
+                amount_address++;
+                var del = document.createElement("button");
+
+                var input = document.createElement("input");
+                input.className = "address-list-block__input-address";
+                var parent = document.getElementById("address-list-block");
+                parent.appendChild(input);
+
+                parent.appendChild(del);
+            } else {
+                alert("Слишком много адресов!");
+            }
 
         }
 
+
+
+
+
+
+        //   }
+
+        function initMap() {
+            /*
+         var directionsService = new google.maps.DirectionsService;
+         var directionsRenderer = new google.maps.DirectionsRenderer;
+
+         //? Указывать начальную как?
+         var map = new google.maps.Map(document.getElementById('map'), {
+             zoom: 6,
+             center: { lat: 41.85, lng: -87.65 }
+         });
+         directionsRenderer.setMap(map);
+         */
+
+        }
+
+
     </script>
 
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYmhi5bXh_ADGHAAatx4M5Ns-U_-otMvI&callback=initMap">    </script>
+    <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYmhi5bXh_ADGHAAatx4M5Ns-U_-otMvI&callback=initMap">    </script>-->
 
 
 </body>
