@@ -19,9 +19,19 @@
 
         <div id="interface-panel">
             <div class="standart-padding">
-                <div id="address-list-block">
-                    <div class="add" onclick="addInput()">+</div>
+                <div class="buttons clearfix">
+                    <div class="buttons__add-input" onclick="addInput()">+</div>
+                    <div class="buttons__delete-input" onClick="deleteInput()">-</div>
                 </div>
+
+                <form id="form-address" action="">
+                    <div id="address-list">
+                        <input type="text" class="address-list__input-address">
+                        <input type="text" class="address-list__input-address">
+                        <input type="text" class="address-list__input-address">
+                    </div>
+                    <div class="form-address__submit-button" onclick="getAddressList()">Отправить данные</div>
+                </form>
             </div>
 
         </div>
@@ -35,22 +45,48 @@
 
         var amount_address = 3;
 
+        //Добавляем поле ввода в конец списка адресов
         function addInput() {
-
             if (amount_address < 16) {
                 amount_address++;
-                var del = document.createElement("button");
-
                 var input = document.createElement("input");
-                input.className = "address-list-block__input-address";
-                var parent = document.getElementById("address-list-block");
-                parent.appendChild(input);
+                input.className = "address-list__input-address";
+                var list = document.getElementById("address-list");
+                list.appendChild(input);
 
-                parent.appendChild(del);
             } else {
                 alert("Слишком много адресов!");
             }
+        }
 
+
+        // Удаляем последний дочерний узел списка адресов
+        function deleteInput() {
+            if (amount_address > 2) {
+                amount_address--;
+                var list = document.getElementById("address-list");
+                var lastNode = list.lastChild;
+                while (lastNode && lastNode.nodeType != 1) {
+                    lastNode = lastNode.previousSibling;
+                }
+                if (lastNode) {
+                    lastNode.parentNode.removeChild(lastNode);
+                }
+            } else {
+                alert("Это мало адресов");
+            }
+        }
+
+        //Получаем из формы список адресов
+        function getAddressList() {
+            var list = document.getElementsByClassName("address-list__input-address");
+            var resultList = [];
+            for (elem of list) {
+                if (elem.value != undefined) {
+                    resultList.push(elem.value);
+                }
+            }
+            return resultList;
         }
 
 
