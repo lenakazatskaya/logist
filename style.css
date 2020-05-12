@@ -25,6 +25,11 @@ body {
     float: left;
 }
 
+.standart-padding{
+    padding-left: 50px;
+    padding-top: 50px;
+}
+
 #map-panel{
     background-color: green;
     height: 100vh;
