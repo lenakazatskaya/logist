@@ -19,6 +19,12 @@
 
         <div id="interface-panel">
             <div class="standart-padding">
+
+                <div id="start-and-end">
+                    <input type="text" id="start-and-end__start-point" value="Москва">
+                    <input type="text" id="start-and-end__end-point" value="Владивосток">
+                </div>
+
                 <div class="buttons clearfix">
                     <div class="buttons__add-input" onclick="addInput()">+</div>
                     <div class="buttons__delete-input" onClick="deleteInput()">-</div>
@@ -26,11 +32,12 @@
 
                 <form id="form-address" action="">
                     <div id="address-list">
-                        <input type="text" class="address-list__input-address">
-                        <input type="text" class="address-list__input-address">
-                        <input type="text" class="address-list__input-address">
+                        <input type="text" class="address-list__input-address" value="Омск">
+                        <input type="text" class="address-list__input-address" value="Киров">
+                        <input type="text" class="address-list__input-address" value="Новосибирск">
                     </div>
-                    <div class="form-address__submit-button" onclick="getAddressList()">Отправить данные</div>
+            
+                    <div id="form-address__submit-button">Отправить данные</div>
                 </form>
             </div>
 
@@ -80,41 +87,60 @@
         //Получаем из формы список адресов
         function getAddressList() {
             var list = document.getElementsByClassName("address-list__input-address");
-            var resultList = [];
+            var waypts = [];
             for (elem of list) {
                 if (elem.value != undefined) {
-                    resultList.push(elem.value);
+                    waypts.push({
+                        location: elem.value,
+                        stopover: true
+                    });
                 }
             }
-            return resultList;
+            return waypts;
         }
 
 
-
-
-
-
-        //   }
 
         function initMap() {
-            /*
-         var directionsService = new google.maps.DirectionsService;
-         var directionsRenderer = new google.maps.DirectionsRenderer;
+            var directionsService = new google.maps.DirectionsService;
+            var directionsRenderer = new google.maps.DirectionsRenderer;
 
-         //? Указывать начальную как?
-         var map = new google.maps.Map(document.getElementById('map'), {
-             zoom: 6,
-             center: { lat: 41.85, lng: -87.65 }
-         });
-         directionsRenderer.setMap(map);
-         */
+            //? Указывать начальную как?
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 6,
+                center: { lat: 41.85, lng: -87.65 }
+            });
+            directionsRenderer.setMap(map);
 
+            document.getElementById('form-address__submit-button').addEventListener('click', function () {
+                calculateAndDisplayRoute(directionsService, directionsRenderer);
+            });
         }
 
+        function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+            //Собираем промежуточные точки
+            var waypts = getAddressList();
 
+
+            directionsService.route({
+                origin: document.getElementById("start-and-end__start-point").value,
+                destination: document.getElementById("start-and-end__end-point").value,
+                waypoints: waypts,
+                travelMode: 'DRIVING'
+            }, function (response, status) {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(response);
+                }
+                else {
+                    window.alert('Directions request failed due to ' + status);
+                }
+            });
+        }
     </script>
 
-    <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYmhi5bXh_ADGHAAatx4M5Ns-U_-otMvI&callback=initMap">    </script>-->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYmhi5bXh_ADGHAAatx4M5Ns-U_-otMvI&callback=initMap">    </script>
+    -->
 
 
 </body>
