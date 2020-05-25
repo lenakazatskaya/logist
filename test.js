@@ -1,21 +1,30 @@
-/*
-var dMatrix = [
-    ["INF", 638893, 2695949, 1422219, 1798245],
-    [637888, "INF", 3345190, 793180, 2447486],
-    [2706849, 3356737, "INF", 4140063, 947757],
-    [1422092, 794622, 4129394, "INF", 3231690],
-    [1793809, 2443697, 949435, 3227023, "INF"]]
-
-*/
-
-class Point {
-    constructor(i, j, bound) {
+//СТРУКТУРЫ
+class Verge {
+    constructor(i, j, weigth, rate) {
         this.i = i;
         this.j = j;
-        this.bound = bound;
+        this.weigth = weigth;
+        this.rate = rate;
+
     }
 }
 
+class Node {
+    constructor(arrayVerge, loverBound) {
+        this.arrayVerge = JSON.parse(JSON.stringify(arrayVerge));
+        this.loverBound = loverBound;
+    }
+
+}
+//ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+
+//Массив, хранящий все созданные узлы
+arrayNode = [];
+
+//Массив, хранящий все матрицы по тем же индексам, что и узлы
+arrayMatrix = [];
+
+//ТЕСТОВЫЕ ДАННЫЕ
 var dMatrix = [
     ["INF", 20, 18, 12, 8],
     [5, "INF", 14, 7, 11],
@@ -26,12 +35,6 @@ var dMatrix = [
 var origins = ["Омск", "Новосибирск", "Москва", "Красноярск", "Киров"];
 var destinations = ["Омск", "Новосибирск", "Москва", "Красноярск", "Киров"];
 
-var bound;
-var endPath = [];
-
-//? Проверим эвристику
-var allPoint = [];
-
 /*Редукция матрицы.
 Принимает на вход матрицу расстояний 
 Возвращает оценку нижней границы. Нижняя граница - это стоимость, меньше которой невозможно построить данный маршрут.
@@ -41,9 +44,6 @@ var allPoint = [];
 function matrixReduction(matrix) {
     //сумма всех вычтенных значений(констант приведения) = нижняя граница
     let lowerBound = 0;
-
-    let minRow = [];
-    let minColumn = [];
 
     //Размерность матрицы, отдельно чтобы не вызывать каждый раз
     let len = matrix.length;
@@ -89,49 +89,71 @@ function matrixReduction(matrix) {
     return lowerBound;
 }
 
-//Расчет коэффициента для выбранного нулевого элемента
-function getCoefficient(dMatrix, i, j) {
-    let rMin = Number.MAX_VALUE;
-    let cMin = Number.MAX_VALUE;
-    for (let k = 0; k < dMatrix.length; k++) {
-
-        if (rMin > dMatrix[i][k] && k != j) {
-            rMin = dMatrix[i][k];
-        }
-        if (cMin > dMatrix[k][j] && k != i) {
-            cMin = dMatrix[k][j];
+//Функция, превращающая список ребер в упорядоченный список точек
+//ПРОВЕРЕНО
+function vergesToAddress(list) {
+    let result = [];
+    result.push(list[0].i, list[0].j);
+    for (let i = 1; i < list.length; i++) {
+        let temp = result[result.length - 1];
+        for (let j = 0; j < list.length; j++) {
+            if (temp === list[j].i) {
+                result.push(list[j].j);
+                j = list.length;
+            }
         }
     }
-    return rMin + cMin;
+    return result;
 }
 
-//Поиск всех нулевых элементов и расчет их коэффициентов
-//Получим индекс нулевого элемента с максимальным коэффициентом
-function getZerosCoeff(dMatrix) {
-    var maxZero = [];
-    var maxZerosValue = Number.MIN_VALUE;
+/*Расчет коэффициента для выбранного ребра
+Принимает матрицу расстояний и координаты ребра
+Возвращает штраф за неиспользование ребра
+*/
+//ПРОВЕРЕНО
+function getRateVerge(matrix, i, j) {
+    let rowMinValue = Number.MAX_VALUE;
+    let colMinValue = Number.MAX_VALUE;
+    for (let k = 0; k < matrix.length; k++) {
+        if (rowMinValue > matrix[i][k] && k != j) {
+            rowMinValue = matrix[i][k];
+        }
+        if (colMinValue > matrix[k][j] && k != i) {
+            colMinValue = matrix[k][j];
+        }
+    }
+    return rowMinValue + colMinValue;
+}
 
-    for (let i = 0; i < dMatrix.length; i++) {
+/* Получает редуцированную матрицу
+Ищет все нулевые элементы и оценивает их.
+Получим ребро с максимальным штрафом*/
+//ПРОВЕРЕНО
+function getBestVerge(matrix) {
 
-        for (let j = 0; j < dMatrix.length; j++) {
-            if (dMatrix[i][j] == 0) {
-                let temp = getCoefficient(dMatrix, i, j);
-                if (temp > maxZerosValue) {
-                    maxZerosValue = temp;
-                    maxZero[0] = i;
-                    maxZero[1] = j;
+    let bestVerge = new Verge('INF', 'INF', 'INF', Number.MIN_VALUE);
+
+    for (let i = 0; i < matrix.length; i++) {
+
+        for (let j = 0; j < matrix.length; j++) {
+            if (matrix[i][j] == 0) {
+                let rate = getRateVerge(matrix, i, j);
+                if (rate > bestVerge.rate) {
+                    bestVerge = new Verge(i, j, matrix[i][j], rate);
                 }
             }
         }
     }
-    return maxZero;
+    return bestVerge;
 }
 
 //Функция удаляет выбранный столбец
-//!Разобраться как это работает и сделать такое же для строк
-function removeEl(array, remIdx) {
-    return array.map(function (arr) {
-        return arr.filter(function (el, idx) { return idx !== remIdx });
+//ПРОВЕРЕНО
+//!Разобраться как это работает и сделать такое же для строк 
+//!Нужно ли возвращать копию?
+function deleteColumn(matrix, index) {
+    return matrix.map(function (arr) {  
+        return arr.filter(function (el, idx) { return idx !== index });
     });
 };
 
@@ -189,34 +211,18 @@ function f1(matrix, a, b) {
 }
 
 
-//Функция, превращающая список ребер в список точек по порядку
-//ПРОВЕРЕНО
-function edgesToAddress(list) {
-    let result = [];
-    result.push(list[0].i, list[0].j);
-    for (let i = 1; i < list.length; i++) {
-        let temp = result[result.length - 1];
-        for (let j = 0; j < list.length; j++) {
-            if (temp === list[j].i) {
-                result.push(list[j].j);
-                j = list.length;
-            }
-        }
-    }
-    return result;
-}
-
-var flag;
 
 //!Не забыть что это должно быть рекурсивным. Или сделать итеративным?
 //!Матрица все таки изменяется
 function TSP(dMatrix) {
 
-    console.log(matrixReduction(dMatrix));
     console.log(dMatrix);
-
-
     
+    console.log(deleteColumn(dMatrix, 1));
+
+
+
+
     /*
 
  //? пишут, что это грязная вещь( js такой js ) проверить, насколько грязная
