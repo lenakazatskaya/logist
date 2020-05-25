@@ -63,7 +63,7 @@ body {
     cursor: pointer;
 }
 
-.form-address__submit-button{
+#form-address__submit-button{
     background-color: tomato;
     text-align: center;
     line-height: 30px;

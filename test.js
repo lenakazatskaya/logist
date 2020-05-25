@@ -1,10 +1,10 @@
 /*
 var dMatrix = [
-    ["inf1", 638893, 2695949, 1422219, 1798245],
-    [637888, "inf1", 3345190, 793180, 2447486],
-    [2706849, 3356737, "inf1", 4140063, 947757],
-    [1422092, 794622, 4129394, "inf1", 3231690],
-    [1793809, 2443697, 949435, 3227023, "inf1"]]
+    ["INF", 638893, 2695949, 1422219, 1798245],
+    [637888, "INF", 3345190, 793180, 2447486],
+    [2706849, 3356737, "INF", 4140063, 947757],
+    [1422092, 794622, 4129394, "INF", 3231690],
+    [1793809, 2443697, 949435, 3227023, "INF"]]
 
 */
 
@@ -17,11 +17,11 @@ class Point {
 }
 
 var dMatrix = [
-    ["inf1", 1, 2, 3, 4],
-    [5, "inf1", 6, 7, 8],
-    [1, 2, "inf1", 3, 4],
-    [5, 6, 7, "inf1", 8],
-    [2, 3, 5, 6, "inf1"]];
+    ["INF", 20, 18, 12, 8],
+    [5, "INF", 14, 7, 11],
+    [12, 18, "INF", 6, 11],
+    [11, 17, 11, "INF", 12],
+    [5, 5, 5, 5, "INF"]];
 
 var origins = ["Омск", "Новосибирск", "Москва", "Красноярск", "Киров"];
 var destinations = ["Омск", "Новосибирск", "Москва", "Красноярск", "Киров"];
@@ -32,66 +32,63 @@ var endPath = [];
 //? Проверим эвристику
 var allPoint = [];
 
-//Редукция матрицы
-function substractFromMatrix(dMatrix) {
-    //сумма всех вычтенных значений
-    var subtractSum = 0;
+/*Редукция матрицы.
+Принимает на вход матрицу расстояний 
+Возвращает оценку нижней границы. Нижняя граница - это стоимость, меньше которой невозможно построить данный маршрут.
+Изменяет принятую матрицу так, чтобы в каждой строке и столбце был минимум один нуль.
+*/
+//ПРОВЕРЕНО
+function matrixReduction(matrix) {
+    //сумма всех вычтенных значений(констант приведения) = нижняя граница
+    let lowerBound = 0;
 
-    var minRow = [];
-    var minColumn = [];
+    let minRow = [];
+    let minColumn = [];
 
-    var len = dMatrix.length;
+    //Размерность матрицы, отдельно чтобы не вызывать каждый раз
+    let len = matrix.length;
 
-    //? Можно убрать пару условий, если заранее заполнить массивы. Стоит ли?
-    //Поиск минимального элемента в каждой строке
+    //Приведение строк
     for (let i = 0; i < len; i++) {
-        for (let j = 0; j < len; j++) {
-            if (minRow[i] == undefined && dMatrix[i][j] != "inf1") {
-                minRow[i] = dMatrix[i][j];
-            } else {
-                if (dMatrix[i][j] < minRow[i]) {
-                    minRow[i] = dMatrix[i][j];
-                }
+        let min = Number.MAX_VALUE;
+
+        //Находим минимальный элемент в строке
+        for (let elem of matrix[i]) {
+            if (min > elem) {
+                min = elem;
             }
         }
-        //Вычитание минимальных элементов из всех
-        //элементов строки, кроме бесконечностей
 
+        //Добавляем его к нижней границе
+        lowerBound += min;
+
+        //Отнимаем константу приведения от каждого значения строки
+        //Матрица изменяется в этом месте
         for (let j = 0; j < len; j++) {
-            if (dMatrix[i][j] != "inf1") {
-                dMatrix[i][j] -= minRow[i];
-            }
-
-            //Поиск минимального элемента в столбце,
-            //после вычитания строк
-            if (minColumn[i] == undefined && dMatrix[i][j] != "inf1") {
-                minColumn[i] = dMatrix[i][j];
-            } else {
-                if (dMatrix[i][j] < minColumn[i]) {
-                    minColumn[i] = dMatrix[i][j];
-                }
-            }
+            matrix[i][j] -= min;
         }
     }
 
-    //Вычитание минимальных элементов
-    //из всех элементов столбца
-
+    //Приведение столбцов
     for (let j = 0; j < len; j++) {
+        let min = Number.MAX_VALUE
+
         for (let i = 0; i < len; i++) {
-            if (dMatrix[i][j] != "inf1") {
-                dMatrix[i][j] -= minColumn[j];
+            if (min > matrix[i][j]) {
+                min = matrix[i][j];
             }
+        }
+
+        lowerBound += min;
+
+        for (let i = 0; i < len; i++) {
+            matrix[i][j] -= min;
         }
     }
 
-    //просуммируем что получилось
-    for (let i = 0; i < len; i++) {
-        subtractSum += minRow[i];
-        subtractSum += minColumn[i];
-    }
-    return subtractSum;
+    return lowerBound;
 }
+
 //Расчет коэффициента для выбранного нулевого элемента
 function getCoefficient(dMatrix, i, j) {
     let rMin = Number.MAX_VALUE;
@@ -107,6 +104,7 @@ function getCoefficient(dMatrix, i, j) {
     }
     return rMin + cMin;
 }
+
 //Поиск всех нулевых элементов и расчет их коэффициентов
 //Получим индекс нулевого элемента с максимальным коэффициентом
 function getZerosCoeff(dMatrix) {
@@ -144,7 +142,7 @@ function M1(matrix, a, b) {
     let m1 = removeEl(matrix, b);
     m1.splice(a, 1);
     if (a != b) {
-        m1[b][a] = "inf1";
+        m1[b][a] = "INF";
     }
     console.log(m1);
 }
@@ -152,7 +150,7 @@ function M1(matrix, a, b) {
 //Эта матрица не содержит выбранное ребро
 //Мы просто закрываем путь из i в j, так как сочли его нецелессообразным
 function M2(matrix, a, b) {
-    matrix[i][j] = "inf1";
+    matrix[i][j] = "INF";
     return substractFromMatrix(m2);
 }
 
@@ -165,7 +163,7 @@ function f1(matrix, a, b) {
 
     //! Еще раз прочитать про это
     /*if (a != b) {
-        m1[b][a] = "inf1";
+        m1[b][a] = "INF";
     }
     */
 
@@ -173,7 +171,7 @@ function f1(matrix, a, b) {
     //  console.log(m1);
 
     let m2 = JSON.parse(JSON.stringify(matrix));
-    m2[a][b] = "inf1";
+    m2[a][b] = "INF";
 
     let temp1 = substractFromMatrix(m1);
     let temp2 = substractFromMatrix(m2);
@@ -190,43 +188,66 @@ function f1(matrix, a, b) {
     }
 }
 
+
+//Функция, превращающая список ребер в список точек по порядку
+//ПРОВЕРЕНО
+function edgesToAddress(list) {
+    let result = [];
+    result.push(list[0].i, list[0].j);
+    for (let i = 1; i < list.length; i++) {
+        let temp = result[result.length - 1];
+        for (let j = 0; j < list.length; j++) {
+            if (temp === list[j].i) {
+                result.push(list[j].j);
+                j = list.length;
+            }
+        }
+    }
+    return result;
+}
+
 var flag;
 
 //!Не забыть что это должно быть рекурсивным. Или сделать итеративным?
 //!Матрица все таки изменяется
 function TSP(dMatrix) {
 
-    //? пишут, что это грязная вещь( js такой js ) проверить, насколько грязная
-    let tempMatrix = JSON.parse(JSON.stringify(dMatrix))
-    //Редуцируем
-    bound = substractFromMatrix(tempMatrix);
+    console.log(matrixReduction(dMatrix));
+    console.log(dMatrix);
 
-    // console.log(tempMatrix);
 
-   
-    while (tempMatrix.length >= 2) {
+    
+    /*
 
-        //Выбираем ребро
-        var path = getZerosCoeff(tempMatrix);
-        // console.log("В начале");
-        //  console.log(tempMatrix);
-        // console.log(path);
-        //Оцениваем что лучше
-        tempMatrix = f1(tempMatrix, path[0], path[1]);
-        console.log(flag);
-        if (flag) {
-            endPath.push(new Point(origins[path[0]], destinations[path[1]], bound));
-            origins.splice(path[0], 1);
-            destinations.splice(path[1], 1);
-        }
+ //? пишут, что это грязная вещь( js такой js ) проверить, насколько грязная
+ let tempMatrix = JSON.parse(JSON.stringify(dMatrix))
+ //Редуцируем
+ bound = substractFromMatrix(tempMatrix);
 
-    }
+ // console.log(tempMatrix);
 
-    console.log(tempMatrix);
-    console.log(origins);
-    console.log(destinations);
 
-    console.log(endPath);
+ while (tempMatrix.length >= 2) {
+
+  
+     //Выбираем ребро
+     var path = getZerosCoeff(tempMatrix);
+     // console.log("В начале");
+     //  console.log(tempMatrix);
+     // console.log(path);
+     //Оцениваем что лучше
+     tempMatrix = f1(tempMatrix, path[0], path[1]);
+     console.log(flag);
+     if (flag) {
+         endPath.push(new Point(origins[path[0]], destinations[path[1]], bound));
+         origins.splice(path[0], 1);
+         destinations.splice(path[1], 1);
+     }
+    
+
+}
+ */
+
 }
 
 TSP(dMatrix);
