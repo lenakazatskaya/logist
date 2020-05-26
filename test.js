@@ -1,9 +1,10 @@
 //СТРУКТУРЫ
 class Verge {
-    constructor(i, j, weigth, rate) {
+    //?Добавить ли вес ребра?
+    constructor(i, j, rate) {
         this.i = i;
         this.j = j;
-        this.weigth = weigth;
+       // this.weigth = weigth;
         this.rate = rate;
 
     }
@@ -13,6 +14,12 @@ class Node {
     constructor(arrayVerge, loverBound) {
         this.arrayVerge = JSON.parse(JSON.stringify(arrayVerge));
         this.loverBound = loverBound;
+    }
+    constructor(parentNode, verge) {
+        //? Может оставить просто ссылкой?
+        this.arrayVerge = JSON.parse(JSON.stringify(parentNode.arrayVerge));
+        this.arrayVerge.push(verge);
+        this.loverBound = parentNode.loverBound + verge.rate;
     }
 
 }
@@ -152,26 +159,42 @@ function getBestVerge(matrix) {
 //!Разобраться как это работает и сделать такое же для строк 
 //!Нужно ли возвращать копию?
 function deleteColumn(matrix, index) {
-    return matrix.map(function (arr) {  
+    return matrix.map(function (arr) {
         return arr.filter(function (el, idx) { return idx !== index });
     });
 };
 
-//M1 равна M с удаленными строкой i и столбцом j. Эта матрица содержит выбранное ребро
-//Если i!-j, удаляем в измененной матрице ребро j,i чтобы избежать создания
-//нескольких независимых циклов
-function M1(matrix, a, b) {
-    let m1 = removeEl(matrix, b);
-    m1.splice(a, 1);
-    if (a != b) {
-        m1[b][a] = "INF";
+/*M1 равна M с удаленными строкой i и столбцом j. Эта матрица содержит выбранное ребро
+Если i!-j, удаляем в измененной матрице ребро j,i чтобы избежать создания
+нескольких независимых циклов
+Возвращает новую матрицу
+*/
+//ПРОВЕРЕНО
+//! ПРОВЕРИТЬ ТЕОРИЮ
+
+function createM1(matrix, i, j) {
+    let m1 = deleteColumn(matrix, j);
+    m1.splice(i, 1);
+    if (i != j) {
+        m1[j][i] = "INF";
     }
-    console.log(m1);
+    return m1;
 }
 
-//Эта матрица не содержит выбранное ребро
-//Мы просто закрываем путь из i в j, так как сочли его нецелессообразным
-function M2(matrix, a, b) {
+/*Версия с удалением 
+function createM1(matrix, i, j) {
+    let m1 = deleteColumn(matrix, j);
+    m1.splice(i, 1);
+    if (i != j) {
+        m1[j][i] = "INF";
+    }
+    return m1;
+}
+*/
+/*Эта матрица не содержит выбранное ребро
+Мы просто закрываем путь из i в j, так как сочли его нецелессообразным
+*/
+function createM2(matrix, a, b) {
     matrix[i][j] = "INF";
     return substractFromMatrix(m2);
 }
@@ -217,9 +240,9 @@ function f1(matrix, a, b) {
 function TSP(dMatrix) {
 
     console.log(dMatrix);
-    
-    console.log(deleteColumn(dMatrix, 1));
 
+    let arrayVerge = [];
+    arrayVerge.push(new Verge('A', 'S', 4))
 
 
 
