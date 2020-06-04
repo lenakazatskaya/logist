@@ -224,13 +224,46 @@ function copyMatrix(matrix) {
     return newMatrix;
 }
 
+/*
+function isEnd(matrix) {
+  
+   for (let i = 0; i < matrix.length; i++) {
+       for (let j = 0; j < matrix.length; j++) {
+//Че то условие не работает
+           if (matrix[i][j] != undefined) {
+               console.log(matrix[i][j]);
+               return false;
+           }
+       }
+   }
+   return true;
+}*/
+
+function isEnd(node) {
+    if (node.loverBound == getLengthRoute(node)) {
+        return true;
+    }
+    return false;
+
+}
+
+function getLengthRoute(node) {
+    let lengthRoute = 0;
+
+    for (let i = 0; i < node.arrayVerge.length; i++) {
+        lengthRoute += distance_matrix[node.arrayVerge[i].i][node.arrayVerge[i].j];
+    }
+    return lengthRoute;
+}
+
 //Может переписать тупо на поиск индекса указателю
 function getBestNode() {
     let bestLoverBound = Number.MAX_VALUE;
     let bestNode;
-    for (let i = 2; i < arrayNode.length; i++) {
+    for (let i = 0; i < arrayNode.length; i++) {
         if (bestLoverBound > arrayNode[i].loverBound && arrayNode[i].visited == false) {
             bestNode = arrayNode[i];
+            bestLoverBound = arrayNode[i].loverBound;
             marker = i;
         }
     }
@@ -239,8 +272,6 @@ function getBestNode() {
 }
 
 
-//!Не забыть что это должно быть рекурсивным. Или сделать итеративным?
-//!Матрица все таки изменяется
 function TSP(dMatrix) {
 
 
@@ -252,14 +283,15 @@ function TSP(dMatrix) {
     arrayMatrix.push(copyMatrix(currentMatrix));
 
     //А тут надо как раз цикл запускать
-    for (let i = 0; i < 4; i++) {
+    while (true) {
+
+        if (currentNode.arrayVerge.length == dMatrix.length - 2) {
+            console.log(currentNode);
+            console.log(currentMatrix);
+            break;
+        }
+
         let verge = getBestVerge(currentMatrix);
-
-        let m1 = matrixСhange(true, verge.i, verge.j, currentMatrix);
-        leftRate = matrixReduction(m1);
-
-        arrayMatrix.push(copyMatrix(m1));
-        arrayNode.push(createChildNode(currentNode, verge, leftRate));
 
         let m2 = matrixСhange(false, verge.i, verge.j, currentMatrix);
         rightRate = matrixReduction(m2);
@@ -267,32 +299,28 @@ function TSP(dMatrix) {
         arrayMatrix.push(copyMatrix(m2));
         arrayNode.push(createChildNode(currentNode, 'INF', rightRate));
 
-        console.log(verge);
-        console.log(leftRate < rightRate);
+        let m1 = matrixСhange(true, verge.i, verge.j, currentMatrix);
+        leftRate = matrixReduction(m1);
 
-
+        arrayMatrix.push(copyMatrix(m1));
+        arrayNode.push(createChildNode(currentNode, verge, leftRate));
         currentNode = getBestNode();
         currentMatrix = arrayMatrix[marker];
-        //console.log(marker);
-
-        console.log(arrayNode);
-
     }
 
-
-
-    // verge = getBestVerge(currentMatrix);
-    // console.log(verge);
-
-
-
-
-
-
-    // while(arrayNode[arrayNode.length].arrayVerge.length!=distance_matrix.length)
-
-
+    for (let i = 0; i < currentMatrix.length; i++) {
+        for (let j = 0; j < currentMatrix.length; j++) {
+            if (!Number.isNaN(currentMatrix[i][j])) {
+                verge = new Verge(i, j);
+                currentNode = createChildNode(currentNode, verge);
+                currentMatrix = matrixСhange(true, i, j, currentMatrix);
+            }
+        }
+    }
+    return vergesToAddress(currentNode.arrayVerge);
 }
 
-TSP(dMatrix);
+
+
+console.log(TSP(dMatrix));
 
