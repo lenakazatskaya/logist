@@ -1,11 +1,10 @@
+//В этом модуле находится метод Литтла для решения задачи коммивояжера.
 
 //СТРУКТУРЫ
 class Verge {
     constructor(i, j, weigth, rate) {
         this.i = i;
         this.j = j;
-        this.weigth = weigth;
-        this.rate = rate;
     }
 }
 
@@ -54,9 +53,6 @@ let dMatrix = [
     [12, 18, NaN, 6, 11],
     [11, 17, 11, NaN, 12],
     [5, 5, 5, 5, NaN]];
-
-var origins = ["Омск", "Новосибирск", "Москва", "Красноярск", "Киров"];
-var destinations = ["Омск", "Новосибирск", "Москва", "Красноярск", "Киров"];
 
 /*Редукция матрицы.
 Принимает на вход матрицу расстояний 
@@ -113,8 +109,7 @@ function matrixReduction(matrix) {
             matrix[i][j] -= min;
         }
     }
-
-
+    
     return lowerBound;
 }
 
@@ -224,29 +219,6 @@ function copyMatrix(matrix) {
     return newMatrix;
 }
 
-/*
-function isEnd(matrix) {
-  
-   for (let i = 0; i < matrix.length; i++) {
-       for (let j = 0; j < matrix.length; j++) {
-//Че то условие не работает
-           if (matrix[i][j] != undefined) {
-               console.log(matrix[i][j]);
-               return false;
-           }
-       }
-   }
-   return true;
-}*/
-
-function isEnd(node) {
-    if (node.loverBound == getLengthRoute(node)) {
-        return true;
-    }
-    return false;
-
-}
-
 function getLengthRoute(node) {
     let lengthRoute = 0;
 
@@ -274,7 +246,6 @@ function getBestNode() {
 
 function TSP(dMatrix) {
 
-
     let currentNode = new Node([], matrixReduction(dMatrix));
     let currentMatrix = dMatrix;
     currentNode.visited = true;
@@ -282,12 +253,8 @@ function TSP(dMatrix) {
     arrayNode.push(currentNode);
     arrayMatrix.push(copyMatrix(currentMatrix));
 
-    //А тут надо как раз цикл запускать
     while (true) {
-
         if (currentNode.arrayVerge.length == dMatrix.length - 2) {
-            console.log(currentNode);
-            console.log(currentMatrix);
             break;
         }
 
