@@ -36,7 +36,7 @@
                         <input type="text" class="address-list__input-address" value="Киров">
                         <input type="text" class="address-list__input-address" value="Новосибирск">
                     </div>
-            
+
                     <div id="form-address__submit-button">Отправить данные</div>
                 </form>
             </div>
@@ -48,6 +48,8 @@
         </div>
 
     </div>
+    <script src="distance-matrix.js" type="text/javascript"></script>
+    <script src="tsp.js" type="text/javascript"></script>
     <script>
 
         var amount_address = 3;
@@ -99,7 +101,7 @@
             return waypts;
         }
 
-
+//Прям тут асинхронку замутить
 
         function initMap() {
             var directionsService = new google.maps.DirectionsService;
@@ -117,9 +119,24 @@
             });
         }
 
+        function wayptsToAddress(list) {
+            let address = [];
+            for (let i = 0; i < list.length; i++) {
+                address.push(list[i].location);
+            }
+            return address;
+        }
+
         function calculateAndDisplayRoute(directionsService, directionsRenderer) {
             //Собираем промежуточные точки
             var waypts = getAddressList();
+
+
+            let matrix = 0;
+            matrix = fn(wayptsToAddress(waypts));
+            console.log(matrix);
+
+            //  interfaceTSP(matrix);
 
 
             directionsService.route({
