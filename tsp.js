@@ -2,9 +2,10 @@
 
 //СТРУКТУРЫ
 class Verge {
-    constructor(i, j, weigth, rate) {
+    constructor(i, j, rate) {
         this.i = i;
         this.j = j;
+        this.rate = rate;
     }
 }
 
@@ -158,7 +159,7 @@ function getRateVerge(matrix, i, j) {
 //ПРОВЕРЕНО
 function getBestVerge(matrix) {
 
-    let bestVerge = new Verge(NaN, NaN, NaN, Number.MIN_VALUE);
+    let bestVerge = new Verge(NaN, NaN, -5);
 
     for (let i = 0; i < matrix.length; i++) {
 
@@ -166,7 +167,7 @@ function getBestVerge(matrix) {
             if (matrix[i][j] == 0) {
                 let rate = getRateVerge(matrix, i, j);
                 if (rate > bestVerge.rate) {
-                    bestVerge = new Verge(i, j, distance_matrix[i][j], rate);
+                    bestVerge = new Verge(i, j, rate);
                 }
             }
         }
@@ -196,6 +197,7 @@ function matrixСhange(flag, i, j, matr) {
             matrix[j][i] = NaN;
         }
     } else {
+        // console.log(i,j);
         matrix[i][j] = NaN;
     }
     return matrix;
@@ -254,6 +256,8 @@ function TSP(distance_matrix, dMatrix) {
     arrayMatrix.push(copyMatrix(currentMatrix));
 
     while (true) {
+        console.log(currentNode);
+        console.log(currentMatrix);
         if (currentNode.arrayVerge.length == dMatrix.length - 2) {
             break;
         }
@@ -284,13 +288,16 @@ function TSP(distance_matrix, dMatrix) {
             }
         }
     }
+    console.log(currentNode);
     return vergesToAddress(currentNode.arrayVerge);
 }
 
-function interfaceTSP(matrix){
+
+function interfaceTSP(matrix) {
+    console.log(matrix);
     let distance_matrix = matrix;
     let dMatrix = matrix;
     return TSP(distance_matrix, dMatrix);
-
 }
+
 

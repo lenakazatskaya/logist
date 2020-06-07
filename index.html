@@ -101,7 +101,7 @@
             return waypts;
         }
 
-//Прям тут асинхронку замутить
+        //Прям тут асинхронку замутить
 
         function initMap() {
             var directionsService = new google.maps.DirectionsService;
@@ -129,30 +129,45 @@
 
         function calculateAndDisplayRoute(directionsService, directionsRenderer) {
             //Собираем промежуточные точки
-            var waypts = getAddressList();
+            let waypts = getAddressList();
+            let address = wayptsToAddress(waypts);
 
+            console.log(waypts);
+            console.log(address);
 
-            let matrix = 0;
-            matrix = fn(wayptsToAddress(waypts));
-            console.log(matrix);
+            let promise = getDistanceMatrix(address);
+            promise.then(function (resultMatrix) {
+                // Функция  возвращает promise,
+                // результат которого попадет в следующий then
+                endAddress = interfaceTSP(resultMatrix);
 
-            //  interfaceTSP(matrix);
+                console.log(endAddress);
+                let endWaypts = [];
 
+                for (let i = 1; i < endAddress.length - 1; i++) {
+                    endWaypts.push(waypts[endAddress[i]]);
 
-            directionsService.route({
-                origin: document.getElementById("start-and-end__start-point").value,
-                destination: document.getElementById("start-and-end__end-point").value,
-                waypoints: waypts,
-                travelMode: 'DRIVING'
-            }, function (response, status) {
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(response);
                 }
-                else {
-                    window.alert('Directions request failed due to ' + status);
-                }
+
+                directionsService.route({
+                    // origin: document.getElementById("start-and-end__start-point").value,
+                    // destination: document.getElementById("start-and-end__end-point").value,
+                    origin: waypts[endAddress[0]].location,
+                    destination: waypts[endAddress[length]].location,
+                    waypoints: endWaypts,
+                    travelMode: 'DRIVING'
+                }, function (response, status) {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(response);
+                    }
+                    else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
             });
         }
+
+
     </script>
 
     <script async defer

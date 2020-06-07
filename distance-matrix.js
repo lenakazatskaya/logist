@@ -2,9 +2,9 @@
 
 let resultMatrix = 0;
 //На выход таблица расстояний
-async function getDistanceMatrix(address) {
+function getDistanceMatrix(address) {
 
-    let promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         //Инициализируем сервис
         const service = new google.maps.DistanceMatrixService();
 
@@ -55,15 +55,4 @@ async function getDistanceMatrix(address) {
             resolve(resultMatrix);
         }
     });
-
-    let result = await promise;
-    return resultMatrix;
-
-}
-
-function fn(address) {
-
-
-
-
 }
