@@ -38,7 +38,7 @@ arrayMatrix = [];
 
 //Указатель на массивы узлов/матриц
 marker = 1;
-/*
+
 //ТЕСТОВЫЕ ДАННЫЕ
 //Для сохранения первоначальных значений
 let distance_matrix = [
@@ -54,7 +54,7 @@ let dMatrix = [
     [12, 18, NaN, 6, 11],
     [11, 17, 11, NaN, 12],
     [5, 5, 5, 5, NaN]];
-*/
+
 /*Редукция матрицы.
 Принимает на вход матрицу расстояний 
 Возвращает оценку нижней границы. Нижняя граница - это стоимость, меньше которой невозможно построить данный маршрут.
@@ -294,10 +294,10 @@ function TSP(distance_matrix, dMatrix) {
 
 
 function interfaceTSP(matrix) {
-    console.log(matrix);
-    let distance_matrix = matrix;
-    let dMatrix = matrix;
-    return TSP(distance_matrix, dMatrix);
+    //console.log(matrix);
+    //let distance_matrix = matrix;
+    //let dMatrix = matrix;
+    console.log( TSP(distance_matrix, dMatrix));
 }
 
 

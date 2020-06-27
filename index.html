@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Логист</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://i.icomoon.io/public/temp/f00134a7d2/UntitledProject/style.css">
 </head>
 
 <body>
@@ -19,17 +20,12 @@
 
         <div id="interface-panel">
             <div class="standart-padding">
-
+                <!--
                 <div id="start-and-end">
                     <input type="text" id="start-and-end__start-point" value="Москва">
                     <input type="text" id="start-and-end__end-point" value="Владивосток">
                 </div>
-
-                <div class="buttons clearfix">
-                    <div class="buttons__add-input" onclick="addInput()">+</div>
-                    <div class="buttons__delete-input" onClick="deleteInput()">-</div>
-                </div>
-
+            -->
                 <form id="form-address" action="">
                     <div id="address-list">
                         <input type="text" class="address-list__input-address" value="Омск">
@@ -37,14 +33,23 @@
                         <input type="text" class="address-list__input-address" value="Новосибирск">
                     </div>
 
+                    <div class="buttons clearfix">
+                        <div class="buttons__add-input" onclick="addInput()"><span class="icon-plus"></span></div>
+                        <div class="buttons__delete-input" onClick="deleteInput()"><span class="icon-minus"></span>
+                        </div>
+                    </div>
+
                     <div id="form-address__submit-button">Отправить данные</div>
                 </form>
             </div>
 
+            <div id="button_download"><span class="icon-download2"></span></div>
+
         </div>
         <div id="map-panel">
-            <div id="map-text"></div>
             <div id="map"></div>
+            <div id="map-text"></div>
+
         </div>
 
     </div>
@@ -101,8 +106,6 @@
             return waypts;
         }
 
-        //Прям тут асинхронку замутить
-
         function initMap() {
             var directionsService = new google.maps.DirectionsService;
             var directionsRenderer = new google.maps.DirectionsRenderer;
@@ -132,9 +135,7 @@
             let waypts = getAddressList();
             let address = wayptsToAddress(waypts);
 
-            console.log(waypts);
-            console.log(address);
-
+/*
             let promise = getDistanceMatrix(address);
             promise.then(function (resultMatrix) {
                 // Функция  возвращает promise,
@@ -148,14 +149,16 @@
                     endWaypts.push(waypts[endAddress[i]]);
 
                 }
-
+*/
                 directionsService.route({
                     // origin: document.getElementById("start-and-end__start-point").value,
                     // destination: document.getElementById("start-and-end__end-point").value,
-                    origin: waypts[endAddress[0]].location,
-                    destination: waypts[endAddress[length]].location,
-                    waypoints: endWaypts,
-                    travelMode: 'DRIVING'
+                    origin: waypts[0].location,
+                    destination: waypts[waypts.length-1].location,
+                    waypoints: waypts,
+                    travelMode: 'DRIVING',
+                    //TRANSIT 
+                    optimizeWaypoints: true
                 }, function (response, status) {
                     if (status === 'OK') {
                         directionsRenderer.setDirections(response);
@@ -164,7 +167,7 @@
                         window.alert('Directions request failed due to ' + status);
                     }
                 });
-            });
+           // });
         }
 
 

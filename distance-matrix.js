@@ -26,8 +26,6 @@ function getDistanceMatrix(address) {
                 reject('status_err');
                 return;
             }
-            //  console.log("dmatrix response");
-            // console.log(response);
 
             //А теперь парсим
             var len = address.length;
@@ -49,8 +47,6 @@ function getDistanceMatrix(address) {
                     }
                 }
             }
-            // console.log(distmatrix);
-            //  console.log(tmatrix);
             resultMatrix = distmatrix;
             resolve(resultMatrix);
         }
